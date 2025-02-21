@@ -90,3 +90,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemImage: {fileID: 1929423691203796591}
   slotImage: {fileID: 21300000, guid: 4f033cdd2b09f9a43b139729d09d002c, type: 3}
+  panel: {fileID: 0}
+  rectTransform: {fileID: 7176487991564024322}

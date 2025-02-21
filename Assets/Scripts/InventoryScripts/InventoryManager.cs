@@ -6,6 +6,7 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager Instance { get; private set; }
     private Dictionary<ItemType, List<ItemInfo>> itemLists;
     private int gold;
+    public RectTransform invenDeletArea;
     public GameObject EquipItemPanel;
     public GameObject ConsumItemPanel;
     public GameObject MiscItemPanel;
@@ -96,12 +97,13 @@ public class InventoryManager : MonoBehaviour
             ItemType itemType = entry.Key;
             List<ItemInfo> items = entry.Value;
             GameObject panel = GetPanelByItemType((itemType));
+            GameObject slotObj = Instantiate(ItemSlotPrefab, panel.transform);
             for (int i = 0; i < 42; i++)
             {
-                GameObject slotObj = Instantiate(ItemSlotPrefab, panel.transform);
-                Slot slotComponent = slotObj.GetComponent<Slot>();
+                Slot slotComponent = slotObj.GetComponent<Slot>();                
                 slotComponent.SetSlotIndex(i);
             }
+            
         }
     }
     private GameObject GetPanelByItemType(ItemType itemtype)
