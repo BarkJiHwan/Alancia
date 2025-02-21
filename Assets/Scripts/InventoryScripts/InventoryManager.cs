@@ -13,14 +13,12 @@ public class InventoryManager : MonoBehaviour
     public GameObject QuestItemPanel;
     public GameObject ItemSlotPrefab;
 
-    private Dictionary<ItemType, List<ItemInfo>> capturedSlots;
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
         }
         else
         {
@@ -29,6 +27,7 @@ public class InventoryManager : MonoBehaviour
         InitializeInventory();
         InventorySlotSetting();
     }
+
     private void InitializeInventory()
     {
         itemLists = new Dictionary<ItemType, List<ItemInfo>>()
@@ -38,74 +37,81 @@ public class InventoryManager : MonoBehaviour
             {ItemType.MiscItem, new List<ItemInfo>()},
             {ItemType.QuestItem, new List<ItemInfo>()}
         };
-        capturedSlots = new Dictionary<ItemType, List<ItemInfo>>();
         gold = 0;
     }
+
     public void AddItem(ItemInfo item)
     {
         if (itemLists.ContainsKey(item.itemType))
         {
-            Debug.Log(item.itemType);
             itemLists[item.itemType].Add(item);
+            UpdateInventorySlots();
         }
         else
         {
             Debug.Log("타입을 설정하자.");
         }
-        //InventorySlotUpdate(item);
-        InventorySlotUpdate();
     }
-    public void InventorySlotUpdate()
-    {
-        //ClearInventorySlots();        
-        UpdateSlots(EquipItemPanel, itemLists[ItemType.EquipItem]);
-        UpdateSlots(ConsumItemPanel, itemLists[ItemType.ConsumItem]);
-        UpdateSlots(MiscItemPanel, itemLists[ItemType.MiscItem]);
-        UpdateSlots(QuestItemPanel, itemLists[ItemType.QuestItem]);
-    }
-    //private void ClearInventorySlots()
-    //{
-    //    ClearSlots(EquipItemPanel);
-    //    ClearSlots(ConsumItemPanel);
-    //    ClearSlots(MiscItemPanel);
-    //    ClearSlots(QuestItemPanel);
-    //}
-    //private void ClearSlots(GameObject panel)
-    //{
-    //    foreach (Transform child in panel.transform)
-    //    {
-    //        Slot slotGetComponent = child.GetComponent<Slot>();
-    //        if (slotGetComponent != null)
-    //        {
-    //            Destroy(child.gameObject);
-    //        }
-    //    }
-    //}
-    private void UpdateSlots(GameObject panel, List<ItemInfo> items)
-    {
-        for (int i = 0; i < items.Count; i++)
-        {
-            Transform slotTransform = panel.transform.GetChild(i);
-            Slot slotComponent = slotTransform.GetComponent<Slot>();
-            slotComponent.SetItem(items[i]);
-        }
-    }
-    private void InventorySlotSetting()
+
+    public void UpdateInventorySlots()
     {
         foreach (var entry in itemLists)
         {
             ItemType itemType = entry.Key;
             List<ItemInfo> items = entry.Value;
-            GameObject panel = GetPanelByItemType((itemType));
-            GameObject slotObj = Instantiate(ItemSlotPrefab, panel.transform);
-            for (int i = 0; i < 42; i++)
+            GameObject panel = GetPanelByItemType(itemType);
+            for (int i = 0; i < items.Count; i++)
             {
-                Slot slotComponent = slotObj.GetComponent<Slot>();                
-                slotComponent.SetSlotIndex(i);
+                Slot slotComponent = panel.transform.GetChild(i).GetComponent<Slot>();
+                slotComponent.SetItem(items[i]);
             }
-            
+        }
+        foreach (Transform child in EquipItemPanel.transform)
+        {
+            child.GetComponent<Slot>().ClearItem();
+        }
+        foreach (Transform child in ConsumItemPanel.transform)
+        {
+            child.GetComponent<Slot>().ClearItem();
+        }
+        foreach (Transform child in MiscItemPanel.transform)
+        {
+            child.GetComponent<Slot>().ClearItem();
+        }
+        foreach (Transform child in QuestItemPanel.transform)
+        {
+            child.GetComponent<Slot>().ClearItem();
+        }
+
+        foreach (var entry in itemLists)
+        {
+            ItemType itemType = entry.Key;
+            List<ItemInfo> items = entry.Value;
+            GameObject panel = GetPanelByItemType(itemType);
+            for (int i = 0; i < items.Count; i++)
+            {
+                Slot slotComponent = panel.transform.GetChild(i).GetComponent<Slot>();
+                slotComponent.SetItem(items[i]);
+            }
         }
     }
+
+    private void InventorySlotSetting()
+    {
+        foreach (var entry in itemLists)
+        {
+            ItemType itemType = entry.Key;
+            GameObject panel = GetPanelByItemType(itemType);
+            for (int i = 0; i < 42; i++)
+            {
+                GameObject slotObj = Instantiate(ItemSlotPrefab, panel.transform);
+                Slot slotComponent = slotObj.GetComponent<Slot>();
+                slotComponent.SetSlotIndex(i);
+                slotComponent.panel = (RectTransform)panel.transform;
+            }
+        }
+    }
+
     private GameObject GetPanelByItemType(ItemType itemtype)
     {
         switch (itemtype)
@@ -123,18 +129,14 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    
     public void AddGold(int money)
     {
         gold += money;
-        int galod = GetGold();
+        GetGold();
     }
+
     public int GetGold()
     {
         return gold;
-    }
-    public void GoldUIUpdate()
-    {
-        //골드 itme 골드는 ItemInfo에 추가해야함
     }
 }

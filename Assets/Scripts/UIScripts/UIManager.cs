@@ -27,7 +27,6 @@ public class UIManager : MonoBehaviour
 
     void CreateInventorySlot()
     {
-        
         for (int i = 0; i< slotCount; i++)
         {
             GameObject slot = Instantiate(inventorySlotPrefab, SlotImages.transform);        
